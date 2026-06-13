@@ -88,6 +88,16 @@ public class TaskController {
             return;
         }
 
+        if (dueDatePicker.getValue() != null) {
+            java.time.LocalDate tanggalDipilih = dueDatePicker.getValue();
+            java.time.LocalDate hariIni = java.time.LocalDate.now();
+
+            if (tanggalDipilih.isBefore(hariIni)) {
+                showAlert(Alert.AlertType.WARNING, "Validasi Tanggal Gagal", "Ups! Kamu tidak bisa memilih tanggal deadline di masa lalu.");
+                return; // Menghentikan proses ke bawah agar data tidak tersimpan
+            }
+        }
+
         Task newTask = new Task();
         newTask.setTitle(titleField.getText());
         newTask.setDescription(descriptionField.getText());

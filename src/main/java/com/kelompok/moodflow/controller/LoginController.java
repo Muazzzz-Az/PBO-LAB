@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Hyperlink;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -20,6 +21,7 @@ public class LoginController {
     @FXML private TextField emailField; // Menggunakan emailField sesuai id di FXML kamu
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
+    @FXML private Hyperlink registerLink;
 
     private final UserService userService;
     private final ConfigurableApplicationContext springContext;
@@ -34,6 +36,20 @@ public class LoginController {
     public void initialize() {
         // Memastikan tombol login merespons saat diklik
         loginButton.setOnAction(e -> handleLogin());
+
+        registerLink.setOnAction(event -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
+                loader.setControllerFactory(springContext::getBean);
+                Parent root = loader.load();
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("MoodFlow - Register");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showErrorAlert("Error System", "Gagal membuka halaman register: " + ex.getMessage());
+            }
+        });
     }
 
     private void handleLogin() {

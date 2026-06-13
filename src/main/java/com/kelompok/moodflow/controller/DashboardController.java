@@ -126,6 +126,7 @@ public class DashboardController {
                 "Teruskan kerja bagusmu untuk menjaga keseimbangan produktivitas dan mood!";
 
         showAlert(Alert.AlertType.INFORMATION, "📈 Productivity Report", report);
+        loadPage("/fxml/report.fxml");
     }
 
     private void handleLogout() {
