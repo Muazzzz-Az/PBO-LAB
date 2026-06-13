@@ -13,12 +13,12 @@ Aplikasi ini dibangun menggunakan **JavaFX** untuk antarmuka pengguna, **Spring 
 
 ## 👥 Anggota Kelompok (Katanya Makan Ayam)
 
-| No | Nama | NIM | Peran / Fokus Tugas |
-|:---:|:---|:---:|:---|
-| 1 | Nailah Salmah | 241401002 | Core Task Controller, Layouting FXML |
-| 2 | Muhammad Aryadefa | 241401050 | Database Configuration, Login System & Validation |
-| 3 | Muaz Al-Fattah | 241401053 | Dashboard Logic, Mood Tracker Backend, Repository |
-| 4 | Nabila Syahri | 241401056 | Register Feature, Analytics Report (PieChart Visual), UI Refactoring |
+| No | Nama | NIM |
+|:---:|:---|:---:|
+| 1 | Nailah Salmah | 241401002 | 
+| 2 | Muhammad Aryadefa | 241401050 | 
+| 3 | Muaz Al-Fattah | 241401053 | 
+| 4 | Nabila Syahri | 241401056 |
 
 ---
 
