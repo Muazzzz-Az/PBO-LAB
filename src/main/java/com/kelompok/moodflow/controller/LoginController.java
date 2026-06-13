@@ -18,7 +18,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class LoginController {
 
-    @FXML private TextField emailField; // Menggunakan emailField sesuai id di FXML kamu
+    @FXML private TextField emailField; 
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
     @FXML private Hyperlink registerLink;
@@ -34,49 +34,47 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        // Memastikan tombol login merespons saat diklik
         loginButton.setOnAction(e -> handleLogin());
-
-        registerLink.setOnAction(event -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
-                loader.setControllerFactory(springContext::getBean);
-                Parent root = loader.load();
-                Stage stage = (Stage) loginButton.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle("MoodFlow - Register");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showErrorAlert("Error System", "Gagal membuka halaman register: " + ex.getMessage());
-            }
-        });
+        registerLink.setOnAction(event -> openRegisterPage());
     }
 
     private void handleLogin() {
-        // Mengambil input dari pengguna
-        String username = emailField.getText();
-        String password = passwordField.getText();
+        String username = emailField.getText().trim();
+        String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showErrorAlert("Validasi Gagal", "Pastikan semua kolom telah diisi!");
+            showAlert(Alert.AlertType.ERROR, "Validasi Gagal", "Pastikan semua kolom telah diisi!");
             return;
         }
 
-        // Mengecek ke database melalui UserService
         if (userService.authenticate(username, password)) {
-            showInfoAlert("Login Berhasil", "Selamat datang kembali!");
+            // FUNGSI DIKEMBALIKAN: Pop-up notifikasi sukses
+            showAlert(Alert.AlertType.INFORMATION, "Login Berhasil", "Selamat datang kembali!");
             openDashboard();
         } else {
-            showErrorAlert("Login Gagal", "Username atau Password salah.");
+            showAlert(Alert.AlertType.ERROR, "Login Gagal", "Username atau Password salah.");
+        }
+    }
+
+    private void openRegisterPage() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
+            loader.setControllerFactory(springContext::getBean);
+            Parent root = loader.load();
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("MoodFlow - Register");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // FUNGSI DIKEMBALIKAN: Detail spesifik error message
+            showAlert(Alert.AlertType.ERROR, "Error System", "Gagal membuka halaman register: " + ex.getMessage());
         }
     }
 
     private void openDashboard() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
-            // Penting: Biarkan Spring yang membuat controller untuk Dashboard
             loader.setControllerFactory(springContext::getBean);
-
             Parent root = loader.load();
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -84,20 +82,13 @@ public class LoginController {
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            showErrorAlert("Error System", "Gagal memuat halaman dashboard.");
+            showAlert(Alert.AlertType.ERROR, "Error System", "Gagal memuat halaman dashboard.");
         }
     }
 
-    private void showInfoAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private void showErrorAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    // CLEAN CODE: Modularisasi method alert agar tidak duplikat
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

@@ -1,7 +1,6 @@
 package com.kelompok.moodflow.controller;
 
-import com.kelompok.moodflow.model.User;
-import com.kelompok.moodflow.repository.UserRepository;
+import com.kelompok.moodflow.service.UserService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,12 +24,12 @@ public class RegisterController {
     @FXML private Button registerButton;
     @FXML private Hyperlink loginLink;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ConfigurableApplicationContext springContext;
 
     @Autowired
-    public RegisterController(UserRepository userRepository, ConfigurableApplicationContext springContext) {
-        this.userRepository = userRepository;
+    public RegisterController(UserService userService, ConfigurableApplicationContext springContext) {
+        this.userService = userService;
         this.springContext = springContext;
     }
 
@@ -45,30 +44,20 @@ public class RegisterController {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
 
-        // 1. Validasi Input Kosong
-        if (fullName.isEmpty() || username.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validasi Gagal", "Semua kolom harus diisi!");
-            return;
+        try {
+            // Controller murni bertugas memanggil Service
+            userService.registerUser(username, password, fullName);
+            
+            showAlert(Alert.AlertType.INFORMATION, "Registrasi Sukses", "Akun berhasil dibuat! Silakan login.");
+            openLoginPage();
+            
+        } catch (IllegalArgumentException e) {
+            // Menangkap error validasi (Kolom kosong / panjang karakter)
+            showAlert(Alert.AlertType.ERROR, "Validasi Gagal", e.getMessage());
+        } catch (IllegalStateException e) {
+            // Menangkap error duplikasi (Username sudah terpakai) persis seperti kodemu
+            showAlert(Alert.AlertType.WARNING, "Registrasi Gagal", e.getMessage());
         }
-
-        // 2. Validasi Panjang Username (Sesuai anotasi @Size di model User temanmu)
-        if (username.length() < 4 || username.length() > 20) {
-            showAlert(Alert.AlertType.ERROR, "Validasi Gagal", "Username harus antara 4-20 karakter.");
-            return;
-        }
-
-        // 3. Cek Apakah Username Sudah Terpakai
-        if (userRepository.findByUsername(username).isPresent()) {
-            showAlert(Alert.AlertType.WARNING, "Registrasi Gagal", "Username sudah terdaftar! Gunakan nama lain.");
-            return;
-        }
-
-        // 4. Simpan User Baru ke Database
-        User newUser = new User(username, password, fullName);
-        userRepository.save(newUser);
-
-        showAlert(Alert.AlertType.INFORMATION, "Registrasi Sukses", "Akun berhasil dibuat! Silakan login.");
-        openLoginPage();
     }
 
     private void openLoginPage() {
