@@ -8,24 +8,33 @@
 
 <VBox spacing="20" xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.kelompok.moodflow.controller.TaskController">
+      fx:controller="com.kelompok.moodflow.controller.TaskController"
+      style="-fx-background-color: #F8F9FA;">
 
     <padding>
         <Insets top="20" right="20" bottom="20" left="20" />
     </padding>
 
-    <HBox alignment="CENTER_LEFT" spacing="20">
-        <Label text="✅ Task Manager" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #6C63FF;" />
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="My Tasks" style="-fx-font-size: 26; -fx-font-weight: bold; -fx-text-fill: #2D2D2D;" />
         <Region HBox.hgrow="ALWAYS" />
-        <Button fx:id="addTaskBtn" text="+ New Task" style="-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-background-radius: 20;" />
+        <Button fx:id="addTaskBtn" text="+ New Task" style="-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;" />
     </HBox>
 
+    <Label text="Manage your daily tasks and track completion with mood" style="-fx-text-fill: #8B8B8B; -fx-font-size: 13;" />
+
+    <!-- Task Form (Hidden by default) -->
     <VBox fx:id="taskForm" visible="false" managed="false" spacing="15"
-          style="-fx-background-color: #F5F5F5; -fx-padding: 20; -fx-border-radius: 10;">
-        <Label text="Add New Task" style="-fx-font-weight: bold; -fx-font-size: 16;" />
+          style="-fx-background-color: white; -fx-padding: 20; -fx-border-radius: 16; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(108,99,255,0.1), 10, 0, 0, 2);">
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="📝 Add New Task" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #6C63FF;" />
+            <Region HBox.hgrow="ALWAYS" />
+        </HBox>
+
         <TextField fx:id="titleField" promptText="Task Title" />
-        <TextArea fx:id="descriptionField" promptText="Description" prefHeight="80" />
-        <DatePicker fx:id="dueDatePicker" promptText="Due Date" />
+        <TextArea fx:id="descriptionField" promptText="Description (optional)" prefHeight="80" />
+        <DatePicker fx:id="dueDatePicker" promptText="Due Date" style="-fx-background-radius: 12;" />
         <ComboBox fx:id="priorityCombo" promptText="Priority">
             <items>
                 <FXCollections fx:factory="observableArrayList">
@@ -35,16 +44,21 @@
                 </FXCollections>
             </items>
         </ComboBox>
-        <HBox spacing="10">
-            <Button fx:id="saveTaskBtn" text="Save" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
-            <Button fx:id="cancelTaskBtn" text="Cancel" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
+        <HBox spacing="12">
+            <Button fx:id="saveTaskBtn" text="Save Task" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" />
+            <Button fx:id="cancelTaskBtn" text="Cancel" style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" />
         </HBox>
     </VBox>
 
-    <HBox spacing="10">
-        <Button fx:id="markDoneBtn" text="✔️ Tandai Selesai &amp; Lapor Mood" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;" />
-        <Button fx:id="deleteTaskBtn" text="🗑️ Hapus Tugas" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
+    <!-- Action Buttons -->
+    <HBox spacing="12">
+        <Button fx:id="markDoneBtn" text="Mark as Done &amp; Log Mood" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;" />
+        <Button fx:id="deleteTaskBtn" text="Delete Task" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-cursor: hand;" />
     </HBox>
 
-    <ListView fx:id="taskListView" prefHeight="400" />
+    <!-- Task List Title -->
+    <Label text="📋 Your Tasks" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2D2D2D; -fx-padding: 10 0 0 0;" />
+
+    <!-- Task List with Card Design -->
+    <ListView fx:id="taskListView" prefHeight="380" style="-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;" />
 </VBox>

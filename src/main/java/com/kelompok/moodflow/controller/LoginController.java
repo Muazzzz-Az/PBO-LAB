@@ -1,6 +1,8 @@
 package com.kelompok.moodflow.controller;
 
+import com.kelompok.moodflow.model.User;
 import com.kelompok.moodflow.service.UserService;
+import com.kelompok.moodflow.controller.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,18 +20,22 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class LoginController {
 
-    @FXML private TextField emailField; 
+    @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
     @FXML private Hyperlink registerLink;
 
     private final UserService userService;
-    private final ConfigurableApplicationContext springContext;
+    private final SessionManager sessionManager;
+    private final ConfigurableApplicationContext springContext; //
 
     @Autowired
-    public LoginController(UserService userService, ConfigurableApplicationContext springContext) {
+    public LoginController(UserService userService,
+                           SessionManager sessionManager,
+                           ConfigurableApplicationContext springContext) { //
         this.userService = userService;
-        this.springContext = springContext;
+        this.sessionManager = sessionManager;
+        this.springContext = springContext; //
     }
 
     @FXML
@@ -48,8 +54,14 @@ public class LoginController {
         }
 
         if (userService.authenticate(username, password)) {
-            // FUNGSI DIKEMBALIKAN: Pop-up notifikasi sukses
-            showAlert(Alert.AlertType.INFORMATION, "Login Berhasil", "Selamat datang kembali!");
+            // 🔥 AMBIL USER OBJECT DAN SIMPAN KE SESSION
+            User loggedInUser = userService.findByUsername(username);
+            if (loggedInUser != null) {
+                sessionManager.setCurrentUser(loggedInUser);
+            }
+
+            showAlert(Alert.AlertType.INFORMATION, "Login Berhasil",
+                    "Selamat datang " + (loggedInUser != null ? loggedInUser.getFullName() : "") + "!");
             openDashboard();
         } else {
             showAlert(Alert.AlertType.ERROR, "Login Gagal", "Username atau Password salah.");
@@ -66,7 +78,6 @@ public class LoginController {
             stage.setTitle("MoodFlow - Register");
         } catch (Exception ex) {
             ex.printStackTrace();
-            // FUNGSI DIKEMBALIKAN: Detail spesifik error message
             showAlert(Alert.AlertType.ERROR, "Error System", "Gagal membuka halaman register: " + ex.getMessage());
         }
     }
@@ -86,7 +97,6 @@ public class LoginController {
         }
     }
 
-    // CLEAN CODE: Modularisasi method alert agar tidak duplikat
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

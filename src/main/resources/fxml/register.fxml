@@ -6,68 +6,80 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0"
+<BorderPane prefHeight="650.0" prefWidth="800.0"
             style="-fx-background-color: linear-gradient(to bottom right, #6C63FF, #3F3D9E);"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.kelompok.moodflow.controller.RegisterController">
-    <children>
-        <VBox alignment="CENTER" layoutX="250.0" layoutY="110.0"
-              prefHeight="400.0" prefWidth="300.0"
-              style="-fx-background-color: white; -fx-background-radius: 20;">
+
+    <center>
+        <!-- Card Container - Otomatis di tengah -->
+        <VBox alignment="CENTER" maxWidth="400.0" maxHeight="520.0"
+              style="-fx-background-color: white; -fx-background-radius: 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 20, 0, 0, 5);">
+
             <padding>
-                <Insets bottom="30" left="30" right="30" top="30" />
+                <Insets bottom="35" left="35" right="35" top="35" />
             </padding>
+
             <children>
-                <Label text="🌊 MoodFlow" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #6C63FF;">
-                    <VBox.margin>
-                        <Insets bottom="5" />
-                    </VBox.margin>
-                </Label>
+                <!-- Logo -->
+                <HBox alignment="CENTER" spacing="8">
+                    <Label text="🌊" style="-fx-font-size: 36;" />
+                    <Label text="MoodFlow" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #6C63FF;" />
+                </HBox>
+
                 <Label text="Join us to track your mood!" style="-fx-font-size: 12; -fx-text-fill: #888;">
                     <VBox.margin>
                         <Insets bottom="25" />
                     </VBox.margin>
                 </Label>
 
-                <TextField fx:id="fullNameField" promptText="Full Name">
-                    <VBox.margin>
-                        <Insets bottom="15" />
-                    </VBox.margin>
-                </TextField>
+                <!-- Full Name -->
+                <VBox spacing="6">
+                    <Label text="Full Name" style="-fx-text-fill: #555; -fx-font-size: 12; -fx-font-weight: bold;" />
+                    <TextField fx:id="fullNameField" promptText="John Doe"
+                               style="-fx-background-radius: 12; -fx-padding: 12; -fx-border-color: #E0E0E0; -fx-border-radius: 12;" />
+                </VBox>
 
-                <TextField fx:id="usernameField" promptText="Username">
+                <!-- Username -->
+                <VBox spacing="6">
                     <VBox.margin>
-                        <Insets bottom="15" />
+                        <Insets top="15" />
                     </VBox.margin>
-                </TextField>
+                    <Label text="Username" style="-fx-text-fill: #555; -fx-font-size: 12; -fx-font-weight: bold;" />
+                    <TextField fx:id="usernameField" promptText="johndoe"
+                               style="-fx-background-radius: 12; -fx-padding: 12; -fx-border-color: #E0E0E0; -fx-border-radius: 12;" />
+                </VBox>
 
-                <PasswordField fx:id="passwordField" promptText="Password">
+                <!-- Password -->
+                <VBox spacing="6">
                     <VBox.margin>
-                        <Insets bottom="25" />
+                        <Insets top="15" />
                     </VBox.margin>
-                </PasswordField>
+                    <Label text="Password" style="-fx-text-fill: #555; -fx-font-size: 12; -fx-font-weight: bold;" />
+                    <PasswordField fx:id="passwordField" promptText="••••••••"
+                                   style="-fx-background-radius: 12; -fx-padding: 12; -fx-border-color: #E0E0E0; -fx-border-radius: 12;" />
+                </VBox>
 
-                <Button fx:id="registerButton" prefHeight="40" prefWidth="200"
-                        style="-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;"
-                        text="SIGN UP">
+                <!-- Register Button -->
+                <Button fx:id="registerButton" text="SIGN UP"
+                        style="-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand;"
+                        prefWidth="200" prefHeight="44">
                     <VBox.margin>
-                        <Insets bottom="15" />
+                        <Insets top="25" bottom="15" />
                     </VBox.margin>
                 </Button>
 
+                <!-- Login Link -->
                 <HBox alignment="CENTER" spacing="10">
-                    <children>
-                        <Label text="Already have an account?" style="-fx-text-fill: #888;" />
-                        <Hyperlink fx:id="loginLink" style="-fx-text-fill: #6C63FF;" text="Login" />
-                    </children>
+                    <Label text="Already have an account?" style="-fx-text-fill: #888;" />
+                    <Hyperlink fx:id="loginLink" text="Login" style="-fx-text-fill: #6C63FF; -fx-underline: true; -fx-cursor: hand;" />
                 </HBox>
             </children>
         </VBox>
-    </children>
-</AnchorPane>
+    </center>
+</BorderPane>

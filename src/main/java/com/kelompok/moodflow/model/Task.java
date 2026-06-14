@@ -15,13 +15,14 @@ public class Task extends BaseEntity { // INHERITANCE
     private String title;
 
     private String description;
-    
+
     private LocalDate dueDate;
-    
+
     private String priority; // HIGH, MEDIUM, LOW
-    
-    private boolean isCompleted = false;
-    
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean completed = false;
+
     private String completionMood;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,6 +32,6 @@ public class Task extends BaseEntity { // INHERITANCE
     // PILAR PBO: POLYMORPHISM (Method Overriding)
     @Override
     public String getEntitySummary() {
-        return "Task: " + this.title + " | Status: " + (this.isCompleted ? "Done" : "Pending");
+        return "Task: " + this.title + " | Status: " + (this.completed ? "Done" : "Pending");
     }
 }

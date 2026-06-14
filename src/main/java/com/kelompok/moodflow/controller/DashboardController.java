@@ -3,15 +3,17 @@ package com.kelompok.moodflow.controller;
 import com.kelompok.moodflow.model.Task;
 import com.kelompok.moodflow.repository.MoodRepository;
 import com.kelompok.moodflow.repository.TaskRepository;
+import com.kelompok.moodflow.repository.UserRepository;
+import com.kelompok.moodflow.controller.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -31,67 +33,115 @@ public class DashboardController {
     @FXML private Button reportBtn;
     @FXML private StackPane contentArea;
 
+    @FXML private VBox totalTasksCard;
+    @FXML private VBox completedTasksCard;
+    @FXML private VBox totalMoodsCard;
+
     @FXML private Label totalTasksLabel;
     @FXML private Label completedTasksLabel;
-    @FXML private Label avgMoodLabel; // Kita gunakan untuk total log mood
+    @FXML private Label avgMoodLabel;
 
     private Node homeView;
     private final ConfigurableApplicationContext springContext;
     private final TaskRepository taskRepository;
     private final MoodRepository moodRepository;
+    private final UserRepository userRepository;
+    private final SessionManager sessionManager;
 
     @Autowired
-    public DashboardController(ConfigurableApplicationContext springContext, TaskRepository taskRepository, MoodRepository moodRepository) {
+    public DashboardController(ConfigurableApplicationContext springContext,
+                               TaskRepository taskRepository,
+                               MoodRepository moodRepository,
+                               UserRepository userRepository,
+                               SessionManager sessionManager) {
         this.springContext = springContext;
         this.taskRepository = taskRepository;
         this.moodRepository = moodRepository;
+        this.userRepository = userRepository;
+        this.sessionManager = sessionManager;
     }
 
     @FXML
     public void initialize() {
-        userLabel.setText("Hello, admin!");
+        Scene scene = dashboardBtn.getScene();
+        if (scene != null) {
+            String cssPath = getClass().getResource("/css/style.css").toExternalForm();
+            if (cssPath != null && !scene.getStylesheets().contains(cssPath)) {
+                scene.getStylesheets().add(cssPath);
+                System.out.println("CSS loaded: " + cssPath);
+            }
+        }
+
+        String username = sessionManager.getCurrentUser() != null ?
+                sessionManager.getCurrentUser().getUsername() : "User";
+        userLabel.setText("✨ " + username + " ✨");
+        userLabel.setStyle("-fx-text-fill: white;");
+
         logoutButton.setOnAction(e -> handleLogout());
 
         if (!contentArea.getChildren().isEmpty()) {
             homeView = contentArea.getChildren().get(0);
         }
 
-        // Atur event klik tombol beserta indikator warnanya
         dashboardBtn.setOnAction(e -> { showHome(); setActiveButton(dashboardBtn); });
         tasksBtn.setOnAction(e -> { loadPage("/fxml/task.fxml"); setActiveButton(tasksBtn); });
         moodBtn.setOnAction(e -> { loadPage("/fxml/mood.fxml"); setActiveButton(moodBtn); });
-        reportBtn.setOnAction(e -> { showReportFeature(); setActiveButton(reportBtn); });
+        reportBtn.setOnAction(e -> { loadPage("/fxml/report.fxml"); setActiveButton(reportBtn); });
 
-        // Set tombol dashboard sebagai aktif pertama kali & hitung angka awal
+        if (totalTasksCard != null) totalTasksCard.setOnMouseClicked(this::navigateToTasks);
+        if (completedTasksCard != null) completedTasksCard.setOnMouseClicked(this::navigateToCompletedTasks);
+        if (totalMoodsCard != null) totalMoodsCard.setOnMouseClicked(this::navigateToMood);
+
         setActiveButton(dashboardBtn);
         refreshDashboardStats();
     }
 
-    // --- FUNGSI BARU: MENGUBAH WARNA TOMBOL AKTIF ---
+    private void navigateToTasks(MouseEvent event) {
+        loadPage("/fxml/task.fxml");
+        setActiveButton(tasksBtn);
+    }
+
+    private void navigateToCompletedTasks(MouseEvent event) {
+        loadPage("/fxml/task.fxml");
+        setActiveButton(tasksBtn);
+    }
+
+    private void navigateToMood(MouseEvent event) {
+        loadPage("/fxml/mood.fxml");
+        setActiveButton(moodBtn);
+    }
+
     private void setActiveButton(Button activeBtn) {
-        // 1. Kembalikan semua tombol ke gaya default (transparan)
-        String defaultStyle = "-fx-background-color: transparent; -fx-text-fill: #333; -fx-alignment: CENTER_LEFT; -fx-padding: 10 20; -fx-cursor: hand;";
+        String defaultStyle = "-fx-background-color: transparent; -fx-text-fill: black; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-background-radius: 12;";
+        String activeStyle = "-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-background-radius: 12;";
+
         dashboardBtn.setStyle(defaultStyle);
         tasksBtn.setStyle(defaultStyle);
         moodBtn.setStyle(defaultStyle);
         reportBtn.setStyle(defaultStyle);
 
-        // 2. Beri warna ungu pada tombol yang baru saja diklik
-        activeBtn.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand;");
+        activeBtn.setStyle(activeStyle);
     }
-    // --------------------------------------------------
 
     private void showHome() {
         contentArea.getChildren().clear();
         if (homeView != null) {
             contentArea.getChildren().add(homeView);
-            // Paksa hitung ulang angka statistik SETIAP KALI kembali ke dashboard
             refreshDashboardStats();
         }
     }
 
     private void refreshDashboardStats() {
-        List<Task> tasks = taskRepository.findAll();
+        Long userId = sessionManager.getCurrentUser() != null ?
+                sessionManager.getCurrentUser().getId() : null;
+
+        List<Task> tasks;
+        if (userId != null) {
+            tasks = taskRepository.findByUserId(userId);
+        } else {
+            tasks = taskRepository.findAll();
+        }
+
         long totalTasks = tasks.size();
         long completedTasks = tasks.stream().filter(Task::isCompleted).count();
         long totalMoods = moodRepository.count();
@@ -110,32 +160,20 @@ public class DashboardController {
             contentArea.getChildren().add(view);
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "System Error", "Gagal memuat halaman: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", "Gagal memuat halaman: " + e.getMessage());
         }
     }
 
-    private void showReportFeature() {
-        long t = taskRepository.count();
-        long c = taskRepository.findAll().stream().filter(Task::isCompleted).count();
-        long m = moodRepository.count();
-
-        String report = "Laporan Produktivitas Kamu:\n\n" +
-                "✅ Total Tugas Dibuat: " + t + "\n" +
-                "🏆 Tugas Selesai: " + c + "\n" +
-                "😊 Total Log Mood: " + m + "\n\n" +
-                "Teruskan kerja bagusmu untuk menjaga keseimbangan produktivitas dan mood!";
-
-        showAlert(Alert.AlertType.INFORMATION, "📈 Productivity Report", report);
-        loadPage("/fxml/report.fxml");
-    }
-
     private void handleLogout() {
+        sessionManager.logout();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             loader.setControllerFactory(springContext::getBean);
             Parent root = loader.load();
             Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            stage.setScene(scene);
             stage.setTitle("MoodFlow - Login");
         } catch (IOException ex) {
             ex.printStackTrace();
